@@ -61,7 +61,7 @@ const MatchesPage = () => {
     };
 
     return (
-        <main>
+        <div className="bg-gray-300 mb-10">
             <div className="w-full px-4">
                 <div className="bg-white rounded-lg shadow border p-6">
                     {/* Header with back button */}
@@ -121,7 +121,7 @@ const MatchesPage = () => {
                     )}
                 </div>
             </div>
-        </main>
+        </div>
     );
 };
 

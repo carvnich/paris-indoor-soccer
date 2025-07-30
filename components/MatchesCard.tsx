@@ -57,8 +57,8 @@ const MatchesCard = ({matches}: MatchesCardProps) => {
             <div className="bg-white rounded-lg shadow border p-6">
                 {/* Header with navigation */}
                 <div className="flex items-center justify-between mb-6">
-                    <Button variant="outline" size="icon" onClick={goToPreviousDay} className="h-8 w-8">
-                        <CaretLeftIcon className="h-4 w-4"/>
+                    <Button variant="outline" size="icon" onClick={goToPreviousDay} className="h-12 w-12">
+                        <CaretLeftIcon/>
                     </Button>
 
                     <div className="text-center">
@@ -67,13 +67,13 @@ const MatchesCard = ({matches}: MatchesCardProps) => {
                         </h2>
                     </div>
 
-                    <Button variant="outline" size="icon" onClick={goToNextDay} className="h-8 w-8">
-                        <CaretRightIcon className="h-4 w-4"/>
+                    <Button variant="outline" size="icon" onClick={goToNextDay} className="h-12 w-12">
+                        <CaretRightIcon/>
                     </Button>
                 </div>
 
                 {/* Matches for the current day */}
-                <div className="flex flex-wrap -mx-2">
+                <div className="flex flex-wrap justify-center -mx-2">
                     {currentDay.matches.map((match) => (
                         <div key={match.id} className="w-full md:w-1/3 px-2 mb-4">
                             <MatchesList {...match} />
