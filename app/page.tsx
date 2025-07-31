@@ -1,19 +1,24 @@
-import React from "react";
+"use client";
+
+import React, {useState} from "react";
 import MatchesCard from "@/components/MatchesCard";
 import StandingsCard from "@/components/StandingsCard";
-import {matchData} from "@/constants/matchData";
+import {getAvailableSeasons, getMatchesForSeason} from "@/lib/utils";
 
 const Page = () => {
+    const availableSeasons = getAvailableSeasons(); // Remove matchData parameter
+    const [selectedSeason, setSelectedSeason] = useState(availableSeasons[0] || "2024/2025");
+
+    const seasonMatches = getMatchesForSeason(selectedSeason); // Remove matchData parameter
+
     return (
         <div className="flex flex-col md:flex-col w-full gap-8">
-            {/* StandingsCard comes first on mobile (order-1), second on md+ (md:order-2) */}
             <section className="order-1 md:order-2 w-full">
-                <StandingsCard matches={matchData}/>
+                <StandingsCard matches={seasonMatches} selectedSeason={selectedSeason} availableSeasons={availableSeasons} onSeasonChange={setSelectedSeason}/>
             </section>
 
-            {/* MatchesCard comes second on mobile (order-2), first on md+ (md:order-1) */}
             <section className="order-2 md:order-1 w-full">
-                <MatchesCard matches={matchData}/>
+                <MatchesCard matches={seasonMatches} selectedSeason={selectedSeason}/>
             </section>
         </div>
     );

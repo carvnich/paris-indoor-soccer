@@ -9,17 +9,17 @@ interface MatchRowProps {
 const MatchRow = ({match}: MatchRowProps) => {
     return (
         <tr className="border-b border-gray-100">
-            <td className="py-3 px-4">
-                <div className="flex justify-between items-center">
+            <td className="py-3 px-2 sm:px-4">
+                <div className="flex items-center">
                     {/* Home Team */}
-                    <div className="flex items-center space-x-2 w-20">
-                        <TShirtIcon size={20} color={match.homeColor} weight="fill"/>
-                        <span className="text-sm font-medium truncate">{match.homeTeam}</span>
+                    <div className="flex items-center justify-end space-x-1 sm:space-x-2 flex-1 min-w-0">
+                        <span className="text-xs sm:text-sm font-medium truncate text-right">{match.homeTeam}</span>
+                        <TShirtIcon size={16} className="sm:w-5 sm:h-5 shrink-0" color={match.homeColor} weight="fill"/>
                     </div>
 
                     {/* Score */}
-                    <div className="text-center w-24">
-                        <div className="flex items-center justify-center space-x-2 text-xl font-bold">
+                    <div className="text-center w-16 sm:w-24 px-2 sm:px-4">
+                        <div className="flex items-center justify-center space-x-1 sm:space-x-2 text-lg sm:text-xl font-bold">
                             <span>{match.homeScore}</span>
                             <span>-</span>
                             <span>{match.awayScore}</span>
@@ -27,9 +27,9 @@ const MatchRow = ({match}: MatchRowProps) => {
                     </div>
 
                     {/* Away Team */}
-                    <div className="flex items-center space-x-2 w-20 justify-end">
-                        <span className="text-sm font-medium truncate">{match.awayTeam}</span>
-                        <TShirtIcon size={20} color={match.awayColor} weight="fill"/>
+                    <div className="flex items-center justify-start space-x-1 sm:space-x-2 flex-1 min-w-0">
+                        <TShirtIcon size={16} className="sm:w-5 sm:h-5 shrink-0" color={match.awayColor} weight="fill"/>
+                        <span className="text-xs sm:text-sm font-medium truncate text-left">{match.awayTeam}</span>
                     </div>
                 </div>
             </td>

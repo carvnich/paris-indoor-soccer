@@ -8,9 +8,12 @@ import {calculateStandings, type Match as MatchType} from "@/lib/utils";
 
 interface StandingsCardProps {
     matches: MatchType[];
+    selectedSeason: string;
+    availableSeasons: string[];
+    onSeasonChange: (season: string) => void;
 }
 
-const StandingsCard = ({matches}: StandingsCardProps) => {
+const StandingsCard = ({matches, selectedSeason, availableSeasons, onSeasonChange}: StandingsCardProps) => {
     // Calculate standings using utility function
     const standings = useMemo(() => calculateStandings(matches), [matches]);
 
@@ -21,12 +24,16 @@ const StandingsCard = ({matches}: StandingsCardProps) => {
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold">Standings</h2>
 
-                    <Select defaultValue="2024-2025" disabled>
+                    <Select value={selectedSeason} onValueChange={onSeasonChange}>
                         <SelectTrigger className="w-32">
                             <SelectValue placeholder="Season"/>
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="2024-2025">2024/2025</SelectItem>
+                            {availableSeasons.map((season) => (
+                                <SelectItem key={season} value={season}>
+                                    {season}
+                                </SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>
@@ -36,14 +43,14 @@ const StandingsCard = ({matches}: StandingsCardProps) => {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="w-12 text-center">#</TableHead>
+                                <TableHead className="w-12 text-center font-bold">#</TableHead>
                                 <TableHead className="w-16"></TableHead>
-                                <TableHead className="w-16 text-center">PL</TableHead>
-                                <TableHead className="w-16 text-center">W</TableHead>
-                                <TableHead className="w-16 text-center">L</TableHead>
-                                <TableHead className="w-20 text-center hidden md:table-cell">+/-</TableHead>
-                                <TableHead className="w-16 text-center">GD</TableHead>
-                                <TableHead className="w-16 text-center">PTS</TableHead>
+                                <TableHead className="w-16 text-center font-bold">PL</TableHead>
+                                <TableHead className="w-16 text-center font-bold">W</TableHead>
+                                <TableHead className="w-16 text-center font-bold">L</TableHead>
+                                <TableHead className="w-20 text-center hidden md:table-cell font-bold">+/-</TableHead>
+                                <TableHead className="w-16 text-center font-bold">GD</TableHead>
+                                <TableHead className="w-16 text-center font-bold">PTS</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>

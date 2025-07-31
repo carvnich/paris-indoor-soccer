@@ -5,23 +5,14 @@ import {Button} from "@/components/ui/button";
 import {CaretLeftIcon, CaretRightIcon} from "@phosphor-icons/react/dist/ssr";
 import MatchesList from "./MatchesList";
 import Link from "next/link";
-
-interface Match {
-    id: string;
-    date: string;
-    homeTeam: string;
-    homeColor: string;
-    homeScore: number;
-    awayTeam: string;
-    awayColor: string;
-    awayScore: number;
-}
+import {type Match} from "@/lib/utils";
 
 interface MatchesCardProps {
     matches: Match[];
+    selectedSeason: string;
 }
 
-const MatchesCard = ({matches}: MatchesCardProps) => {
+const MatchesCard = ({matches, selectedSeason}: MatchesCardProps) => {
     const [currentDayIndex, setCurrentDayIndex] = useState(0);
 
     // Group matches by date
@@ -39,6 +30,11 @@ const MatchesCard = ({matches}: MatchesCardProps) => {
 
     const currentDay = matchesByDay[currentDayIndex];
     const totalDays = matchesByDay.length;
+
+    // Reset to first day when season changes
+    React.useEffect(() => {
+        setCurrentDayIndex(0);
+    }, [selectedSeason]);
 
     const goToPreviousDay = () => {
         setCurrentDayIndex((prev) => (prev > 0 ? prev - 1 : totalDays - 1));

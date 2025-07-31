@@ -1,20 +1,28 @@
 import {clsx, type ClassValue} from "clsx";
 import {twMerge} from "tailwind-merge";
+import {seasonMatchData} from "@/constants/matchData";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-// Types for match and team statistics
+// Match interface with season
 export interface Match {
     id: string;
     date: string;
+    season: string;
     homeTeam: string;
     homeColor: string;
     homeScore: number;
     awayTeam: string;
     awayColor: string;
     awayScore: number;
+    isPlayoff?: boolean;
+}
+
+export interface SeasonData {
+    season: string;
+    matches: Match[];
 }
 
 export interface TeamStats {
@@ -73,23 +81,31 @@ export function filterMatchesByColor(matchesByDate: { date: string; matches: Mat
     })).filter(({matches}) => matches.length > 0);
 }
 
-// Calculate standings from match data (excluding playoffs starting Mar 28, 2025)
-export function calculateStandings(matches: Match[]): TeamStats[] {
-    // Filter out playoff matches (Mar 28, 2025 and later)
-    const regularSeasonMatches = matches.filter((match) => {
-        const [month, day] = match.date.split(" ");
-        const matchDay = parseInt(day);
+// Flatten all matches into a single array (for backward compatibility)
+export const matchData: Match[] = seasonMatchData.flatMap(seasonData => seasonData.matches);
 
-        // Exclude matches from Mar 28 onwards (playoffs)
-        if (month === "Mar" && matchDay >= 28) return false;
-        if (month === "Apr") return false;
+// Get matches for a specific season
+export const getMatchesForSeason = (season: string): Match[] => {
+    const seasonData = seasonMatchData.find(s => s.season === season);
+    return seasonData ? seasonData.matches : [];
+};
 
-        return true;
-    });
+// Get available seasons
+export const getAvailableSeasons = (): string[] => {
+    return seasonMatchData.map(s => s.season).sort().reverse();
+};
+
+// Calculate standings from match data for a specific season
+export function calculateStandings(matches: Match[], season?: string): TeamStats[] {
+    // Filter by season if specified
+    const seasonMatches = season ? getMatchesForSeason(season) : matches;
+
+    // Filter out playoff matches for standings calculation
+    const regularSeasonMatches = seasonMatches.filter((match) => !match.isPlayoff);
 
     const teamStats: Record<string, TeamStats> = {};
 
-    // Initialize all teams
+    // Initialize all teams that appear in the matches
     regularSeasonMatches.forEach((match) => {
         if (!teamStats[match.homeTeam]) {
             teamStats[match.homeTeam] = {
@@ -156,10 +172,7 @@ export function calculateStandings(matches: Match[]): TeamStats[] {
 
     // Calculate goal difference and sort by points, then goal difference
     return Object.values(teamStats)
-        .map((team) => ({
-            ...team,
-            goalDifference: team.goalsFor - team.goalsAgainst,
-        }))
+        .map((team) => ({...team, goalDifference: team.goalsFor - team.goalsAgainst}))
         .sort((a, b) => {
             if (b.points !== a.points) {
                 return b.points - a.points;
