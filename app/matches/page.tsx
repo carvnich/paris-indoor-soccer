@@ -7,7 +7,7 @@ import {Badge} from "@/components/ui/badge";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {TShirtIcon} from "@phosphor-icons/react/dist/ssr";
 import {ChevronLeft, Calendar} from "lucide-react";
-import {teamColors, groupMatchesByDate, filterMatchesByColor, getAvailableSeasons, getMatchesForSeason} from "@/lib/utils";
+import {teamFilters, groupMatchesByDate, filterMatchesByColor, getAvailableSeasons, getMatchesForSeason} from "@/lib/utils";
 import MatchRow from "@/components/MatchRow";
 import DateHeader from "@/components/DateHeader";
 
@@ -116,7 +116,7 @@ const MatchesPage = () => {
                     {/* Color filters */}
                     <div className="mb-6">
                         <div className="grid grid-cols-7">
-                            {teamColors.map((colorOption) => (
+                            {teamFilters.map((colorOption) => (
                                 <Badge key={colorOption.value} variant={selectedColor === colorOption.value ? "default" : "outline"} className={`cursor-pointer w-full flex items-center justify-center p-2 md:px-3 md:py-2 rounded-none first:rounded-l-md last:rounded-r-md ${selectedColor === colorOption.value ? "bg-gray-300 " : "hover:bg-gray-100"}`} onClick={() => handleColorFilter(colorOption.value)}>
                                     {colorOption.value !== "all" ? (
                                         <>

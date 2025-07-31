@@ -39,7 +39,7 @@ export interface TeamStats {
 }
 
 // Team color options for filtering
-export const teamColors = [
+export const teamFilters = [
     {name: "All", color: "white", value: "all"},
     {name: "Yellow", color: "yellow", value: "yellow"},
     {name: "Black", color: "black", value: "black"},
