@@ -33,3 +33,7 @@ backend/dist/
 *.njsproj
 *.sln
 *.sw?
+
+# Project management files
+TODO.md
+NOTES.md
