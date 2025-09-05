@@ -1,18 +1,14 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { GiSoccerBall } from "react-icons/gi";
 import { HiMenu, HiX } from "react-icons/hi";
 import { Link } from "react-router-dom";
-import { UserContext } from "../../context/UserContext";
-import { useAuthModal } from "../../hooks/useAuthModal";
+import { useUser } from "../../hooks/useUser";
 import AuthModal from "../AuthModal";
 import ProfileInfo from "../ProfileInfo";
 
 const Navbar = () => {
-	const { user } = useContext(UserContext);
+	const { user, isAuthModalOpen, openAuthModal, closeAuthModal } = useUser();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-	// Auth modal state management
-	const { isAuthModalOpen, openAuthModal, closeAuthModal } = useAuthModal();
 
 	// Toggle mobile menu open/close
 	const toggleMenu = () => {

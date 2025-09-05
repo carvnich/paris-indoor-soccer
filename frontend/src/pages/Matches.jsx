@@ -1,11 +1,11 @@
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import React, { useMemo, useRef, useState } from "react";
-import { FaCaretLeft, FaChevronDown, FaRegCalendarAlt } from "react-icons/fa";
+import { FaCaretLeft, FaRegCalendarAlt } from "react-icons/fa";
 import { IoShirt } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
 import DateHeader from "../components/DateHeader";
 import RootLayout from "../components/layouts/RootLayout";
 import MatchRow from "../components/MatchRow";
+import SeasonDropdown from "../components/SeasonDropdown";
 import { useMatch } from "../hooks/useMatch";
 import { filterMatchesByColor, groupMatchesByDate, teamFilters } from "../utils/data";
 
@@ -74,25 +74,8 @@ export const Matches = () => {
 							</div>
 
 							{/* Season selector dropdown */}
-							<div className="flex items-center justify-end space-x-2">
-								<span className="text-sm font-medium">Season:</span>
-								<Menu as="div" className="relative inline-block">
-									<MenuButton disabled={loading} className="inline-flex w-32 justify-center items-center gap-1 rounded-md px-3 py-2 text-sm border border-gray-300 hover:bg-gray-200">
-										{selectedSeason}
-										<FaChevronDown className="size-3" />
-									</MenuButton>
-									<MenuItems className="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md bg-white border border-gray-300 shadow-lg">
-										<div className="py-1">
-											{availableSeasons.map((season) => (
-												<MenuItem key={season}>
-													<button onClick={() => onSeasonChange(season)} className="block w-full px-4 py-2 text-sm hover:bg-gray-200">
-														{season}
-													</button>
-												</MenuItem>
-											))}
-										</div>
-									</MenuItems>
-								</Menu>
+							<div className="flex justify-end">
+								<SeasonDropdown selectedSeason={selectedSeason} availableSeasons={availableSeasons} onSeasonChange={onSeasonChange} disabled={loading} label="Season:" />
 							</div>
 						</div>
 

@@ -6,6 +6,7 @@ import { UserContext } from "./UserContext";
 export const UserProvider = ({ children }) => {
 	const [user, setUser] = useState(null);
 	const [loading, setLoading] = useState(true);
+	const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
 	useEffect(() => {
 		if (user) return;
@@ -42,8 +43,17 @@ export const UserProvider = ({ children }) => {
 		localStorage.removeItem("token");
 	};
 
+	// Auth modal functions
+	const openAuthModal = () => {
+		setIsAuthModalOpen(true);
+	};
+
+	const closeAuthModal = () => {
+		setIsAuthModalOpen(false);
+	};
+
 	return (
-		<UserContext.Provider value={{ user, loading, updateUser, clearUser }}>
+		<UserContext.Provider value={{ user, loading, updateUser, clearUser, isAuthModalOpen, openAuthModal, closeAuthModal }}>
 			{children}
 		</UserContext.Provider>
 	);
