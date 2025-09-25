@@ -8,12 +8,16 @@
 }
 
 @layer base {
-	html{
+	html {
 		font-family: var(--font-display);
 	}
 
 	body {
 		background-color: #d1d5dc;
 		overflow-x: hidden;
+	}
+
+	.date-header-row {
+		scroll-margin-top: 75px;
 	}
 }

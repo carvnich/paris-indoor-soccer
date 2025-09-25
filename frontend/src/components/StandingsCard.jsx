@@ -34,7 +34,7 @@ const StandingsCard = ({ matches, selectedSeason, availableSeasons, onSeasonChan
 			<div className="bg-white rounded-lg p-4 border border-neutral-300">
 				{/* Header */}
 				<div className={`mb-2 ${isLoading ? '' : 'flex items-center justify-between'}`}>
-					<h2 className="text-xl font-bold">Standings</h2>
+					<h2 className="text-2xl font-bold">Standings</h2>
 					{!isLoading && (
 						<SeasonDropdown selectedSeason={selectedSeason} availableSeasons={availableSeasons} onSeasonChange={onSeasonChange} label="Season:" />
 					)}
@@ -55,19 +55,19 @@ const StandingsCard = ({ matches, selectedSeason, availableSeasons, onSeasonChan
 						<table className="w-full">
 							<thead>
 								<tr className="text-black font-bold">
-									<th className="w-12 text-center px-2 py-3 uppercase tracking-wider">#</th>
+									<th className="w-12 text-center px-2 py-3 uppercase">#</th>
 									<th className="w-16 px-2 py-3 uppercase tracking-wider"></th>
-									<th className="w-16 text-center px-2 py-3 uppercase tracking-wider">PL</th>
-									<th className="w-16 text-center px-2 py-3 uppercase tracking-wider">W</th>
-									<th className="w-16 text-center px-2 py-3 uppercase tracking-wider">L</th>
-									<th className="w-20 text-center hidden md:table-cell px-2 py-3 uppercase tracking-wider">+/-</th>
-									<th className="w-16 text-center px-2 py-3 uppercase tracking-wider">GD</th>
-									<th className="w-16 text-center px-2 py-3 uppercase tracking-wider">PTS</th>
+									<th className="w-16 text-center px-2 py-3 uppercase">PL</th>
+									<th className="w-16 text-center px-2 py-3 uppercase">W</th>
+									<th className="w-16 text-center px-2 py-3 uppercase">L</th>
+									<th className="w-20 text-center hidden md:table-cell px-2 py-3 uppercase">+/-</th>
+									<th className="w-16 text-center px-2 py-3 uppercase">GD</th>
+									<th className="w-16 text-center px-2 py-3 uppercase">PTS</th>
 								</tr>
 							</thead>
 							<tbody className="divide-y divide-gray-200">
 								{standings.map((team, index) => (
-									<tr key={team.team} className="hover:bg-gray-200 text-md">
+									<tr key={team.team} className="hover:bg-gray-200 text-lg">
 										<td className="text-center">{index + 1}</td>
 										<td className="text-center">
 											<div className="flex items-center justify-center md:justify-start gap-2">

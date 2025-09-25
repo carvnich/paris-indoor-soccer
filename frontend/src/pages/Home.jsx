@@ -1,10 +1,19 @@
+import { useNavigate } from "react-router-dom";
 import RootLayout from "../components/layouts/RootLayout";
 import MatchesCard from "../components/MatchesCard";
 import StandingsCard from "../components/StandingsCard";
 import { useMatch } from "../hooks/useMatch";
+import { formatMatchDate } from "../utils/data";
 
 export const Home = () => {
 	const { seasonMatches, selectedSeason, availableSeasons, handleSeasonChange, loading } = useMatch();
+	const navigate = useNavigate();
+
+	// Navigate to matches page and scroll to the date of the clicked match
+	const handleMatchClick = (match) => {
+		const matchDate = formatMatchDate(match.dateTime);
+		navigate('/matches', { state: { scrollToDate: matchDate } });
+	};
 
 	return (
 		<RootLayout>
@@ -14,7 +23,7 @@ export const Home = () => {
 				</section>
 
 				<section className="order-2 md:order-1 w-full">
-					<MatchesCard matches={seasonMatches} selectedSeason={selectedSeason} loading={loading} />
+					<MatchesCard matches={seasonMatches} selectedSeason={selectedSeason} loading={loading} onMatchClick={handleMatchClick} />
 				</section>
 			</div>
 		</RootLayout>

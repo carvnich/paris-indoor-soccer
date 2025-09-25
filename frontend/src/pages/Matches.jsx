@@ -1,7 +1,7 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState, useEffect } from "react";
 import { FaCaretLeft, FaRegCalendarAlt } from "react-icons/fa";
 import { IoShirt } from "react-icons/io5";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import DateHeader from "../components/DateHeader";
 import RootLayout from "../components/layouts/RootLayout";
 import MatchRow from "../components/MatchRow";
@@ -14,11 +14,22 @@ export const Matches = () => {
 	const { selectedSeason, seasonMatches, loading, error, availableSeasons, handleSeasonChange } = useMatch();
 	const [selectedColor, setSelectedColor] = useState("all");
 	const navigate = useNavigate();
+	const location = useLocation();
 	const dateRefs = useRef({});
 
 	// Group and filter matches
 	const matchesByDate = useMemo(() => groupMatchesByDate(seasonMatches), [seasonMatches]);
 	const filteredMatchesByDate = useMemo(() => filterMatchesByColor(matchesByDate, selectedColor), [matchesByDate, selectedColor]);
+
+	// Handle scrolling to specific date when navigated from home page
+	useEffect(() => {
+		if (location.state?.scrollToDate && !loading && dateRefs.current[location.state.scrollToDate]) {
+			const timer = setTimeout(() => {
+				dateRefs.current[location.state.scrollToDate]?.scrollIntoView({ behavior: "smooth", block: "start" });
+			}, 200);
+			return () => clearTimeout(timer);
+		}
+	}, [location.state, loading, filteredMatchesByDate]);
 
 	// Event handlers
 	const handleColorFilter = (colorValue) => setSelectedColor(colorValue);

@@ -2,7 +2,7 @@ import { formatFullDate } from "../utils/data";
 
 const DateHeader = ({ date, dateRefs, isPlayoffWeek, matches }) => {
 	return (
-		<tr ref={(el) => dateRefs.current && (dateRefs.current[date] = el)} className="bg-gray-50">
+		<tr ref={(el) => dateRefs.current && (dateRefs.current[date] = el)} className="bg-gray-50 date-header-row">
 			<td className="py-4 px-2 sm:px-4">
 				<div className="flex items-center justify-between">
 					<h3 className="text-base sm:text-xl font-bold text-left">{formatFullDate(matches[0].dateTime)}</h3>
@@ -11,7 +11,7 @@ const DateHeader = ({ date, dateRefs, isPlayoffWeek, matches }) => {
 					)}
 				</div>
 			</td>
-		</tr>
+		</tr >
 	);
 };
 

@@ -5,7 +5,7 @@ import { formatMatchDate } from "../utils/data";
 import MatchesList from "./MatchesList";
 import Spinner from "./Spinner";
 
-const MatchesCard = ({ matches, selectedSeason, loading }) => {
+const MatchesCard = ({ matches, selectedSeason, loading, onMatchClick }) => {
 	const [currentDayIndex, setCurrentDayIndex] = useState(0);
 	const [seasonChanging, setSeasonChanging] = useState(false);
 
@@ -58,7 +58,7 @@ const MatchesCard = ({ matches, selectedSeason, loading }) => {
 							<FaCaretLeft />
 						</button>
 					)}
-					<h2 className="text-xl font-bold">Matches</h2>
+					<h2 className="text-2xl font-bold">Matches</h2>
 					{!isLoading && (
 						<button onClick={goToNextDay} className="h-12 w-12 border border-gray-300 rounded-md flex items-center justify-center bg-white hover:bg-gray-200 focus:outline-none">
 							<FaCaretRight />
@@ -83,7 +83,7 @@ const MatchesCard = ({ matches, selectedSeason, loading }) => {
 						<div className="flex flex-wrap justify-center -mx-2">
 							{currentDay.matches.map(match => (
 								<div key={match._id} className="w-full md:w-1/3 px-2 mb-4">
-									<MatchesList {...match} />
+									<MatchesList {...match} onMatchClick={onMatchClick} />
 								</div>
 							))}
 						</div>
@@ -98,7 +98,7 @@ const MatchesCard = ({ matches, selectedSeason, loading }) => {
 						{/* All Matches Link */}
 						<div className="flex justify-center mt-6">
 							<Link to="/matches">
-								<button className="text-sm border border-gray-300 rounded-md px-4 py-2 bg-white hover:bg-gray-200 focus:outline-none">
+								<button className="text-md border border-gray-300 rounded-md px-4 py-2 bg-white hover:bg-gray-200 focus:outline-none">
 									All Matches
 								</button>
 							</Link>

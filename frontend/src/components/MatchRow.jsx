@@ -15,7 +15,7 @@ const MatchRow = ({ match, onEdit }) => {
 					{/* Home Team */}
 					<div className="flex items-center justify-end space-x-1 sm:space-x-2 flex-1 min-w-0">
 						<span className="text-md md:text-xl">{match.homeTeam}</span>
-						{match.homeTeam !== "TBD" && <IoShirt size={18} className="sm:w-5 sm:h-5 shrink-0" color={getTeamColorHex(match.homeColor)} />}
+						{match.homeTeam !== "TBD" && <IoShirt size={18} color={getTeamColorHex(match.homeColor)} />}
 					</div>
 
 					{/* Score and match time */}
@@ -27,7 +27,7 @@ const MatchRow = ({ match, onEdit }) => {
 									<span>-</span>
 									<span>{match.awayScore}</span>
 								</div>
-								<span className="text-xs text-gray-500">{formatMatchTime(match.dateTime)}</span>
+								<span className="text-sm">{formatMatchTime(match.dateTime)}</span>
 							</>
 						) : (
 							<div className="text-md md:text-xl font-semibold">{formatMatchTime(match.dateTime)}</div>
@@ -36,7 +36,7 @@ const MatchRow = ({ match, onEdit }) => {
 
 					{/* Away Team */}
 					<div className="flex items-center justify-start space-x-1 sm:space-x-2 flex-1 min-w-0">
-						{match.awayTeam !== "TBD" && <IoShirt size={18} className="sm:w-5 sm:h-5 shrink-0" color={getTeamColorHex(match.awayColor)} />}
+						{match.awayTeam !== "TBD" && <IoShirt size={18} color={getTeamColorHex(match.awayColor)} />}
 						<span className="text-md md:text-xl">{match.awayTeam}</span>
 					</div>
 
