@@ -15,19 +15,12 @@ const MatchForm = ({ initialData, onSubmit, onCancel, isLoading = false }) => {
 
 	const handleInputChange = (e) => {
 		const { name, value } = e.target;
-		// Ensure scores are integers only
-		if ((name === 'homeTeamScore' || name === 'awayTeamScore') && value !== '') {
-			const intValue = parseInt(value);
-			if (isNaN(intValue) || intValue < 0) return;
-			setFormData(prev => ({ ...prev, [name]: intValue.toString() }));
-		} else {
-			setFormData(prev => ({ ...prev, [name]: value }));
-		}
+		setFormData(prev => ({ ...prev, [name]: value }));
 	};
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		onSubmit({ homeTeamScore: parseInt(formData.homeTeamScore), awayTeamScore: parseInt(formData.awayTeamScore) });
+		onSubmit({ homeTeamScore: formData.homeTeamScore === '' ? null : parseInt(formData.homeTeamScore), awayTeamScore: formData.awayTeamScore === '' ? null : parseInt(formData.awayTeamScore) });
 	};
 
 	return (
@@ -48,9 +41,9 @@ const MatchForm = ({ initialData, onSubmit, onCancel, isLoading = false }) => {
 				{/* Score Section */}
 				<div className="flex flex-col items-center w-30 mx-6">
 					<div className="flex items-center justify-center space-x-2 text-xl font-bold">
-						<input type="number" name="homeTeamScore" value={formData.homeTeamScore} onChange={handleInputChange} min="0" className="w-14 px-1 py-1 border border-gray-300 rounded-md focus:outline-none text-center text-xl font-bold" required />
+						<input type="number" name="homeTeamScore" value={formData.homeTeamScore} onChange={handleInputChange} min="0" className="w-14 px-1 py-1 border border-gray-300 rounded-md focus:outline-none text-center text-xl font-bold" />
 						<span>-</span>
-						<input type="number" name="awayTeamScore" value={formData.awayTeamScore} onChange={handleInputChange} min="0" className="w-14 px-1 py-1 border border-gray-300 rounded-md focus:outline-none text-center text-xl font-bold" required />
+						<input type="number" name="awayTeamScore" value={formData.awayTeamScore} onChange={handleInputChange} min="0" className="w-14 px-1 py-1 border border-gray-300 rounded-md focus:outline-none text-center text-xl font-bold" />
 					</div>
 				</div>
 
@@ -63,7 +56,7 @@ const MatchForm = ({ initialData, onSubmit, onCancel, isLoading = false }) => {
 
 			{/* Action Buttons */}
 			<div className="grid grid-cols-2 gap-4 pt-4">
-				<button type="submit" disabled={isLoading || !formData.homeTeamScore || !formData.awayTeamScore} className="flex items-center justify-center gap-2 bg-orange-600 text-white px-6 py-3 rounded-md hover:bg-orange-700 disabled:opacity-20 disabled:cursor-not-allowed">
+				<button type="submit" disabled={isLoading} className="flex items-center justify-center gap-2 bg-orange-600 text-white px-6 py-3 rounded-md hover:bg-orange-700 disabled:opacity-20 disabled:cursor-not-allowed">
 					<FaSave className="h-4 w-4" />
 					<span>{isLoading ? 'Saving...' : 'Save'}</span>
 				</button>

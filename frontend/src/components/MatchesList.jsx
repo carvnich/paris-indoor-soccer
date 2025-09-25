@@ -4,6 +4,7 @@ import { formatMatchDate, formatMatchTime } from "../utils/data";
 const MatchesList = ({ dateTime, homeTeam, homeColorHex, homeScore, awayTeam, awayColorHex, awayScore }) => {
 	const date = formatMatchDate(dateTime);
 	const time = formatMatchTime(dateTime);
+	const matchPlayed = homeScore !== null && awayScore !== null;
 
 	return (
 		<article className="p-4 border border-neutral-300 rounded bg-white">
@@ -16,15 +17,27 @@ const MatchesList = ({ dateTime, homeTeam, homeColorHex, homeScore, awayTeam, aw
 					<div className="text-lg">{homeTeam}</div>
 				</div>
 
-				{/* Score */}
+				{/* Score or Date/Time */}
 				<div className="text-center w-24">
-					<div className="flex items-center justify-center space-x-2 text-xl font-bold">
-						<span>{homeScore}</span>
-						<span>-</span>
-						<span>{awayScore}</span>
-					</div>
-					<div className="text-sm">{date}</div>
-					<div className="text-xs text-gray-500">{time}</div>
+					{matchPlayed ? (
+						<>
+							{/* Show score when match is played */}
+							<div className="flex items-center justify-center space-x-2 text-xl font-bold">
+								<span>{homeScore}</span>
+								<span>-</span>
+								<span>{awayScore}</span>
+							</div>
+							{/* Smaller date and time when played */}
+							<div className="text-xs text-gray-500">{date}</div>
+							<div className="text-xs text-gray-500">{time}</div>
+						</>
+					) : (
+						<>
+							{/* Hide dash and show larger date/time when not played */}
+							<div className="text-md font-semibold">{date}</div>
+							<div className="text-xl font-bold">{time}</div>
+						</>
+					)}
 				</div>
 
 				{/* Away */}

@@ -3,23 +3,23 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
 
-const authRoutes = require('./routes/authRoutes');
-const matchRoutes = require('./routes/matchRoutes');
+const authRoutes = require("./routes/authRoutes");
+const matchRoutes = require("./routes/matchRoutes");
 
 const app = express();
 
 // Middleware to handle CORS
 app.use(
-	cors({
-		origin: [
-			process.env.FRONTEND_URL, // Your frontend
-			"http://localhost:3000",  // Local development
-			"http://localhost:5173",  // Vite dev server
-		],
-		// origin: "*",
-		methods: ["GET", "POST", "PUT", "DELETE"],
-		allowedHeaders: ["Content-Type", "Authorization"],
-	})
+    cors({
+        origin: [
+            process.env.FRONTEND_URL, // Your frontend
+            "http://localhost:3000", // Local development
+            "http://localhost:5173", // Vite dev server
+        ],
+        // origin: "*",
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+    })
 );
 
 // Connect Database
