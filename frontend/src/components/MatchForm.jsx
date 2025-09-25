@@ -41,9 +41,9 @@ const MatchForm = ({ initialData, onSubmit, onCancel, isLoading = false }) => {
 				{/* Score Section */}
 				<div className="flex flex-col items-center w-30 mx-6">
 					<div className="flex items-center justify-center space-x-2 text-xl font-bold">
-						<input type="number" name="homeTeamScore" value={formData.homeTeamScore} onChange={handleInputChange} min="0" className="w-14 px-1 py-1 border border-gray-300 rounded-md focus:outline-none text-center text-xl font-bold" />
+						<input type="number" name="homeTeamScore" value={formData.homeTeamScore} onChange={handleInputChange} min="0" inputMode="numeric" className="w-14 px-1 py-1 border border-gray-300 rounded-md focus:outline-none text-center text-xl font-bold" />
 						<span>-</span>
-						<input type="number" name="awayTeamScore" value={formData.awayTeamScore} onChange={handleInputChange} min="0" className="w-14 px-1 py-1 border border-gray-300 rounded-md focus:outline-none text-center text-xl font-bold" />
+						<input type="number" name="awayTeamScore" value={formData.awayTeamScore} onChange={handleInputChange} min="0" inputMode="numeric" className="w-14 px-1 py-1 border border-gray-300 rounded-md focus:outline-none text-center text-xl font-bold" />
 					</div>
 				</div>
 
