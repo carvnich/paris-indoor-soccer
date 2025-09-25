@@ -12,7 +12,7 @@ const MatchesList = ({ dateTime, homeTeam, homeColorHex, homeScore, awayTeam, aw
 				{/* Home */}
 				<div className="text-center w-20">
 					<div className="flex justify-center mb-2">
-						<IoShirt size={24} color={homeColorHex} />
+						{homeTeam !== "TBD" && <IoShirt size={24} color={homeColorHex} />}
 					</div>
 					<div className="text-lg">{homeTeam}</div>
 				</div>
@@ -43,7 +43,7 @@ const MatchesList = ({ dateTime, homeTeam, homeColorHex, homeScore, awayTeam, aw
 				{/* Away */}
 				<div className="text-center w-20">
 					<div className="flex justify-center mb-2">
-						<IoShirt size={24} color={awayColorHex} />
+						{awayTeam !== "TBD" && <IoShirt size={24} color={awayColorHex} />}
 					</div>
 					<div className="text-lg">{awayTeam}</div>
 				</div>
