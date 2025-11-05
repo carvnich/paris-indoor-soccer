@@ -29,7 +29,7 @@ export const Matches = () => {
 			}, 200);
 			return () => clearTimeout(timer);
 		}
-	}, [location.state, loading, filteredMatchesByDate]);
+	}, [location.state, loading]);
 
 	// Event handlers
 	const handleColorFilter = (colorValue) => setSelectedColor(colorValue);
@@ -102,7 +102,7 @@ export const Matches = () => {
 								<div className="mb-6">
 									<div className="grid grid-cols-7 text-sm">
 										{teamFilters.map((colorOption) => (
-											<button key={colorOption.value} disabled={loading} className="flex items-center justify-center py-2 first:rounded-l-md last:rounded-r-md border border-gray-300 hover:bg-gray-200 focus:bg-gray-300" onClick={() => handleColorFilter(colorOption.value)}>
+											<button key={colorOption.value} disabled={loading} className={`flex items-center justify-center py-2 first:rounded-l-md last:rounded-r-md border border-gray-300 hover:bg-gray-200 ${selectedColor === colorOption.value ? 'bg-gray-300' : 'bg-white'}`} onClick={() => handleColorFilter(colorOption.value)}>
 												{colorOption.value !== "all" ? (
 													<>
 														<IoShirt size={24} color={colorOption.color} />

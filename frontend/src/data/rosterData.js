@@ -1,0 +1,51 @@
+// Mock roster data for each team
+export const rosterData = {
+	Yellow: [
+		{ id: 1, name: "Player 1" },
+		{ id: 2, name: "Player 2" },
+		{ id: 3, name: "Player 3" },
+		{ id: 4, name: "Player 4" },
+		{ id: 5, name: "Player 5" },
+		{ id: 6, name: "Player 6" },
+	],
+	Black: [
+		{ id: 7, name: "Player 7" },
+		{ id: 8, name: "Player 8" },
+		{ id: 9, name: "Player 9" },
+		{ id: 10, name: "Player 10" },
+		{ id: 11, name: "Player 11" },
+		{ id: 12, name: "Player 12" },
+	],
+	Green: [
+		{ id: 13, name: "Player 13" },
+		{ id: 14, name: "Player 14" },
+		{ id: 15, name: "Player 15" },
+		{ id: 16, name: "Player 16" },
+		{ id: 17, name: "Player 17" },
+		{ id: 18, name: "Player 18" },
+	],
+	Red: [
+		{ id: 19, name: "Player 19" },
+		{ id: 20, name: "Player 20" },
+		{ id: 21, name: "Player 21" },
+		{ id: 22, name: "Player 22" },
+		{ id: 23, name: "Player 23" },
+		{ id: 24, name: "Player 24" },
+	],
+	Blue: [
+		{ id: 25, name: "Player 25" },
+		{ id: 26, name: "Player 26" },
+		{ id: 27, name: "Player 27" },
+		{ id: 28, name: "Player 28" },
+		{ id: 29, name: "Player 29" },
+		{ id: 30, name: "Player 30" },
+	],
+	Grey: [
+		{ id: 31, name: "Player 31" },
+		{ id: 32, name: "Player 32" },
+		{ id: 33, name: "Player 33" },
+		{ id: 34, name: "Player 34" },
+		{ id: 35, name: "Player 35" },
+		{ id: 36, name: "Player 36" },
+	],
+};

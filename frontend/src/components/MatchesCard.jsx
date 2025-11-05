@@ -30,13 +30,35 @@ const MatchesCard = ({ matches, selectedSeason, loading, onMatchClick }) => {
 
 	const currentDay = matchesByDay[currentDayIndex];
 
-	// Handle season changes
+	// Find the index of the closest date to today
+	const findClosestDateIndex = useMemo(() => {
+		if (!matchesByDay?.length) return 0;
+
+		const currentDate = new Date();
+		let closestIndex = 0;
+		let minDiff = Infinity;
+
+		matchesByDay.forEach((day, index) => {
+			const matchDate = day.matches[0]?.dateTime;
+			if (matchDate) {
+				const diff = Math.abs(currentDate - matchDate);
+				if (diff < minDiff) {
+					minDiff = diff;
+					closestIndex = index;
+				}
+			}
+		});
+
+		return closestIndex;
+	}, [matchesByDay]);
+
+	// Handle season changes and initial load - scroll to closest date
 	React.useEffect(() => {
-		setCurrentDayIndex(0);
+		setCurrentDayIndex(findClosestDateIndex);
 		setSeasonChanging(true);
 		const timer = setTimeout(() => setSeasonChanging(false), 500);
 		return () => clearTimeout(timer);
-	}, [selectedSeason]);
+	}, [selectedSeason, findClosestDateIndex]);
 
 	const goToPreviousDay = () => {
 		setCurrentDayIndex(prev => prev > 0 ? prev - 1 : matchesByDay.length - 1);

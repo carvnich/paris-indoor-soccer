@@ -50,6 +50,11 @@ const Navbar = () => {
 								Matches
 							</h2>
 						</Link>
+						<Link to="/roster">
+							<h2 className="flex text-md text-black hover:underline">
+								Rosters
+							</h2>
+						</Link>
 						{user ? (
 							<ProfileInfo />
 						) : (
@@ -78,6 +83,11 @@ const Navbar = () => {
 							<Link to="/matches" onClick={closeMenu}>
 								<h2 className="text-black hover:text-gray-600 py-2">
 									Matches
+								</h2>
+							</Link>
+							<Link to="/roster" onClick={closeMenu}>
+								<h2 className="text-black hover:text-gray-600 py-2">
+									Rosters
 								</h2>
 							</Link>
 
