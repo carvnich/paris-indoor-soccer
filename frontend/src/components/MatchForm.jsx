@@ -45,8 +45,8 @@ const MatchForm = ({ initialData, onSubmit, onCancel, isLoading = false }) => {
 
 	return (
 		<form onSubmit={handleSubmit} className="space-y-4">
-			{/* Date and Time - Editable */}
-			<div>
+			{/* Date and Time */}
+			<div className="w-full overflow-hidden">
 				<input
 					type="datetime-local"
 					name="dateTime"
@@ -56,7 +56,8 @@ const MatchForm = ({ initialData, onSubmit, onCancel, isLoading = false }) => {
 						const isoString = e.target.value ? new Date(e.target.value).toISOString() : '';
 						setFormData(prev => ({ ...prev, dateTime: isoString }));
 					}}
-					className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none"
+					className="w-full max-w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700 cursor-pointer"
+					style={{ colorScheme: 'light' }}
 				/>
 			</div>
 
