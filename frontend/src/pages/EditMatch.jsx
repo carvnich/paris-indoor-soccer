@@ -33,17 +33,24 @@ export const EditMatch = () => {
 		}
 	}, [user, location.state, navigate]);
 
-	// Handle form submission - update match scores via API
+	// Handle form submission - update match scores and datetime via API
 	const handleSave = async (formData) => {
 		try {
 			setSaving(true);
 			setError(null);
 
-			// Send updated scores to backend
-			await axiosInstance.put(API_PATHS.MATCH.UPDATE(match._id), {
+			// Send updated data to backend
+			const updateData = {
 				homeTeamScore: parseInt(formData.homeTeamScore),
 				awayTeamScore: parseInt(formData.awayTeamScore)
-			});
+			};
+
+			// Include dateTime if it has been modified
+			if (formData.dateTime) {
+				updateData.dateTime = formData.dateTime;
+			}
+
+			await axiosInstance.put(API_PATHS.MATCH.UPDATE(match._id), updateData);
 
 			refetchMatches();
 

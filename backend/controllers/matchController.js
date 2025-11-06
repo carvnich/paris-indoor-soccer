@@ -27,7 +27,7 @@ exports.createMatch = async (req, res) => {
 // @access  Private
 exports.updateMatch = async (req, res) => {
     try {
-        const { homeTeamScore, awayTeamScore } = req.body;
+        const { homeTeamScore, awayTeamScore, dateTime } = req.body;
 
         // Find the match first
         const match = await Match.findById(req.params.id);
@@ -39,6 +39,11 @@ exports.updateMatch = async (req, res) => {
         // Update scores
         match.homeTeam.score = homeTeamScore;
         match.awayTeam.score = awayTeamScore;
+
+        // Update dateTime if provided
+        if (dateTime) {
+            match.dateTime = dateTime;
+        }
 
         await match.save();
 

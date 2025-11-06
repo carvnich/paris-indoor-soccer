@@ -1,15 +1,19 @@
 import { useEffect, useState } from 'react';
 import { FaSave, FaTimes } from 'react-icons/fa';
 import { IoShirt } from 'react-icons/io5';
-import { formatFullDateTime, getTeamColorHex } from './../utils/data';
+import { getTeamColorHex } from './../utils/data';
 
 const MatchForm = ({ initialData, onSubmit, onCancel, isLoading = false }) => {
-	const [formData, setFormData] = useState({ homeTeamScore: '', awayTeamScore: '' });
+	const [formData, setFormData] = useState({ homeTeamScore: '', awayTeamScore: '', dateTime: '' });
 
 	// Initialize form with existing data
 	useEffect(() => {
 		if (initialData) {
-			setFormData({ homeTeamScore: initialData.homeScore?.toString() || '', awayTeamScore: initialData.awayScore?.toString() || '' });
+			setFormData({
+				homeTeamScore: initialData.homeScore?.toString() || '',
+				awayTeamScore: initialData.awayScore?.toString() || '',
+				dateTime: initialData.dateTime || ''
+			});
 		}
 	}, [initialData]);
 
@@ -20,14 +24,40 @@ const MatchForm = ({ initialData, onSubmit, onCancel, isLoading = false }) => {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		onSubmit({ homeTeamScore: formData.homeTeamScore === '' ? null : parseInt(formData.homeTeamScore), awayTeamScore: formData.awayTeamScore === '' ? null : parseInt(formData.awayTeamScore) });
+		onSubmit({
+			homeTeamScore: formData.homeTeamScore === '' ? null : parseInt(formData.homeTeamScore),
+			awayTeamScore: formData.awayTeamScore === '' ? null : parseInt(formData.awayTeamScore),
+			dateTime: formData.dateTime
+		});
+	};
+
+	// Convert ISO datetime string to datetime-local format (YYYY-MM-DDTHH:MM)
+	const convertToDateTimeLocalFormat = (isoString) => {
+		if (!isoString) return '';
+		const date = new Date(isoString);
+		const year = date.getFullYear();
+		const month = String(date.getMonth() + 1).padStart(2, '0');
+		const day = String(date.getDate()).padStart(2, '0');
+		const hours = String(date.getHours()).padStart(2, '0');
+		const minutes = String(date.getMinutes()).padStart(2, '0');
+		return `${year}-${month}-${day}T${hours}:${minutes}`;
 	};
 
 	return (
 		<form onSubmit={handleSubmit} className="space-y-4">
-			{/* Date and Time */}
-			<div className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700">
-				{formatFullDateTime(initialData?.dateTime)}
+			{/* Date and Time - Editable */}
+			<div>
+				<input
+					type="datetime-local"
+					name="dateTime"
+					value={convertToDateTimeLocalFormat(formData.dateTime)}
+					onChange={(e) => {
+						// Convert datetime-local value back to ISO string
+						const isoString = e.target.value ? new Date(e.target.value).toISOString() : '';
+						setFormData(prev => ({ ...prev, dateTime: isoString }));
+					}}
+					className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 focus:outline-none"
+				/>
 			</div>
 
 			{/* Match Details */}

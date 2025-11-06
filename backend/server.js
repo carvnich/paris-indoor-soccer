@@ -5,6 +5,7 @@ const connectDB = require("./config/db");
 
 const authRoutes = require("./routes/authRoutes");
 const matchRoutes = require("./routes/matchRoutes");
+const playerRoutes = require("./routes/playerRoutes");
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/match", matchRoutes);
+app.use("/api/player", playerRoutes);
 
 // Start Server
 const PORT = process.env.PORT || 5000;
