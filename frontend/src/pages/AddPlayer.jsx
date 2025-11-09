@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FaCaretLeft } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import RootLayout from '../components/layouts/RootLayout';
 import PlayerForm from '../components/PlayerForm';
 import { useUser } from '../hooks/useUser';
@@ -28,24 +29,26 @@ export const AddPlayer = () => {
 			setSaving(true);
 			setError(null);
 
-			// Send new player data to backend
-			const createData = {
-				firstName: formData.firstName,
-				lastName: formData.lastName,
-				team: formData.team,
-			};
+			// Create FormData for multipart/form-data request
+			const createData = new FormData();
+			createData.append('firstName', formData.firstName);
+			createData.append('lastName', formData.lastName);
+			createData.append('team', formData.team);
 
-			// Include image data if provided
-			if (formData.imageBase64) {
-				createData.imageBase64 = formData.imageBase64;
+			// Append image file if provided
+			if (formData.imageFile) {
+				createData.append('image', formData.imageFile);
 			}
 
-			await axiosInstance.post(API_PATHS.PLAYER.CREATE, createData);
-
-			// Navigate back with success message
-			navigate('/rosters', {
-				state: { message: 'Player created successfully', type: 'success' }
+			await axiosInstance.post(API_PATHS.PLAYER.CREATE, createData, {
+				headers: {
+					'Content-Type': 'multipart/form-data'
+				}
 			});
+
+			// Show success toast and navigate back
+			toast.success('Player created successfully');
+			navigate('/rosters');
 		} catch (err) {
 			setError(err.response?.data?.message || 'Failed to create player');
 		} finally {

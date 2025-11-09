@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FaCaretLeft } from 'react-icons/fa';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import RootLayout from '../components/layouts/RootLayout';
 import PlayerForm from '../components/PlayerForm';
 import { useUser } from '../hooks/useUser';
@@ -37,29 +38,31 @@ export const EditPlayer = () => {
 			setSaving(true);
 			setError(null);
 
-			// Send updated player data to backend
-			const updateData = {
-				firstName: formData.firstName,
-				lastName: formData.lastName,
-				team: formData.team,
-			};
+			// Create FormData for multipart/form-data request
+			const updateData = new FormData();
+			updateData.append('firstName', formData.firstName);
+			updateData.append('lastName', formData.lastName);
+			updateData.append('team', formData.team);
 
-			// Include image data if changed
-			if (formData.imageBase64) {
-				updateData.imageBase64 = formData.imageBase64;
+			// Append image file if changed
+			if (formData.imageFile) {
+				updateData.append('image', formData.imageFile);
 			}
 
 			// Include delete flag if image was removed
 			if (formData.deleteImage) {
-				updateData.deleteImage = true;
+				updateData.append('deleteImage', 'true');
 			}
 
-			const response = await axiosInstance.put(API_PATHS.PLAYER.UPDATE(player._id), updateData);
-
-			// Navigate back with success message
-			navigate('/rosters', {
-				state: { message: 'Player updated successfully', type: 'success' }
+			await axiosInstance.put(API_PATHS.PLAYER.UPDATE(player._id), updateData, {
+				headers: {
+					'Content-Type': 'multipart/form-data'
+				}
 			});
+
+			// Show success toast and navigate back
+			toast.success('Player updated successfully');
+			navigate('/rosters');
 		} catch (err) {
 			setError(err.response?.data?.message || 'Failed to update player');
 		} finally {
@@ -75,10 +78,9 @@ export const EditPlayer = () => {
 
 			await axiosInstance.delete(API_PATHS.PLAYER.DELETE(player._id));
 
-			// Navigate back with success message
-			navigate('/rosters', {
-				state: { message: 'Player deleted successfully', type: 'success' }
-			});
+			// Show success toast and navigate back
+			toast.success('Player deleted successfully');
+			navigate('/rosters');
 		} catch (err) {
 			setError(err.response?.data?.message || 'Failed to delete player');
 			setSaving(false);

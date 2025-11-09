@@ -49,10 +49,39 @@ exports.getPlayerById = async (req, res) => {
     }
 };
 
+// Helper function to extract file extension from filename or mimetype
+const getFileExtension = (filename, mimetype) => {
+    // First try to get extension from filename
+    if (filename) {
+        const ext = filename.split('.').pop().toLowerCase();
+        if (ext) {
+            // Map common extensions
+            if (ext === 'jpeg') return 'jpg';
+            if (ext === 'heic' || ext === 'heif') return 'heic';
+            return ext;
+        }
+    }
+
+    // Fall back to mimetype
+    if (mimetype) {
+        const match = mimetype.match(/^image\/([a-zA-Z0-9+.-]+)/);
+        if (match && match[1]) {
+            let extension = match[1].toLowerCase();
+            if (extension === 'jpeg') extension = 'jpg';
+            if (extension === 'svg+xml') extension = 'svg';
+            if (extension.includes('heic') || extension.includes('heif')) return 'heic';
+            return extension;
+        }
+    }
+
+    // Default to jpg if we can't determine
+    return 'jpg';
+};
+
 // Create new player
 exports.createPlayer = async (req, res) => {
     try {
-        const { firstName, lastName, team, imageBase64 } = req.body;
+        const { firstName, lastName, team } = req.body;
 
         if (!firstName || !lastName || !team) {
             return res.status(400).json({ message: "First name, last name, and team are required" });
@@ -61,25 +90,32 @@ exports.createPlayer = async (req, res) => {
         let imageUrl = null;
         let imageKitFileId = null;
 
-        // Upload image to ImageKit if provided
-        if (imageBase64) {
+        // Upload image to ImageKit if provided via multipart/form-data
+        if (req.file) {
             try {
-                // Extract file extension from base64 data URL
-                const match = imageBase64.match(/^data:image\/([a-zA-Z0-9+.-]+);base64,/);
-                const fileExtension = match ? match[1] : 'jpg';
+                const fileExtension = getFileExtension(req.file.originalname, req.file.mimetype);
+
+                // Convert buffer to base64 for ImageKit upload
+                const base64Image = req.file.buffer.toString('base64');
 
                 const uploadResponse = await imagekit.upload({
-                    file: imageBase64,
+                    file: base64Image,
                     fileName: `${team}_${firstName}_${lastName}_${Date.now()}.${fileExtension}`,
                     folder: "/paris-indoor-soccer/players",
                     tags: [team, "player"],
+                    // ImageKit will automatically convert HEIC to JPG if needed
+                    useUniqueFileName: true,
                 });
 
                 imageUrl = uploadResponse.url;
                 imageKitFileId = uploadResponse.fileId;
             } catch (uploadError) {
                 console.error("ImageKit upload error:", uploadError);
-                return res.status(500).json({ message: "Failed to upload image", error: uploadError.message });
+                return res.status(500).json({
+                    message: "Failed to upload image",
+                    error: uploadError.message,
+                    details: "The image format may not be supported or the file may be corrupted"
+                });
             }
         }
 
@@ -100,7 +136,7 @@ exports.createPlayer = async (req, res) => {
 // Update player
 exports.updatePlayer = async (req, res) => {
     try {
-        const { firstName, lastName, team, imageBase64, deleteImage } = req.body;
+        const { firstName, lastName, team, deleteImage } = req.body;
 
         const player = await Player.findById(req.params.id);
 
@@ -114,7 +150,7 @@ exports.updatePlayer = async (req, res) => {
         if (team) player.team = team;
 
         // Handle image deletion
-        if (deleteImage && player.imageKitFileId) {
+        if (deleteImage === 'true' && player.imageKitFileId) {
             try {
                 await imagekit.deleteFile(player.imageKitFileId);
                 player.imageUrl = null;
@@ -125,8 +161,8 @@ exports.updatePlayer = async (req, res) => {
             }
         }
 
-        // Handle new image upload
-        if (imageBase64) {
+        // Handle new image upload via multipart/form-data
+        if (req.file) {
             // Delete old image if exists
             if (player.imageKitFileId) {
                 try {
@@ -138,22 +174,29 @@ exports.updatePlayer = async (req, res) => {
 
             // Upload new image
             try {
-                // Extract file extension from base64 data URL
-                const match = imageBase64.match(/^data:image\/([a-zA-Z0-9+.-]+);base64,/);
-                const fileExtension = match ? match[1] : 'jpg';
+                const fileExtension = getFileExtension(req.file.originalname, req.file.mimetype);
+
+                // Convert buffer to base64 for ImageKit upload
+                const base64Image = req.file.buffer.toString('base64');
 
                 const uploadResponse = await imagekit.upload({
-                    file: imageBase64,
+                    file: base64Image,
                     fileName: `${team || player.team}_${firstName || player.firstName}_${lastName || player.lastName}_${Date.now()}.${fileExtension}`,
                     folder: "/paris-indoor-soccer/players",
                     tags: [team || player.team, "player"],
+                    // ImageKit will automatically convert HEIC to JPG if needed
+                    useUniqueFileName: true,
                 });
 
                 player.imageUrl = uploadResponse.url;
                 player.imageKitFileId = uploadResponse.fileId;
             } catch (uploadError) {
                 console.error("ImageKit upload error:", uploadError);
-                return res.status(500).json({ message: "Failed to upload image", error: uploadError.message });
+                return res.status(500).json({
+                    message: "Failed to upload image",
+                    error: uploadError.message,
+                    details: "The image format may not be supported or the file may be corrupted"
+                });
             }
         }
 

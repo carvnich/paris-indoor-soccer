@@ -9,9 +9,10 @@ const PlayerForm = ({ initialData, onSubmit, onCancel, onDelete, isLoading = fal
 		lastName: '',
 		team: 'Yellow',
 		imagePreview: null,
-		imageBase64: null,
+		imageFile: null,
 		deleteImage: false
 	});
+	const [uploadError, setUploadError] = useState(null);
 	const fileInputRef = useRef(null);
 
 	// Filter out "All" option for team selection
@@ -25,52 +26,120 @@ const PlayerForm = ({ initialData, onSubmit, onCancel, onDelete, isLoading = fal
 				lastName: initialData.lastName || '',
 				team: initialData.team || 'Yellow',
 				imagePreview: initialData.imageUrl || null,
-				imageBase64: null,
+				imageFile: null,
 				deleteImage: false
 			});
 		}
 	}, [initialData]);
+
+	// Cleanup object URLs on unmount to prevent memory leaks
+	useEffect(() => {
+		return () => {
+			if (formData.imagePreview && formData.imagePreview.startsWith('blob:')) {
+				URL.revokeObjectURL(formData.imagePreview);
+			}
+		};
+	}, [formData.imagePreview]);
 
 	const handleInputChange = (e) => {
 		const { name, value } = e.target;
 		setFormData(prev => ({ ...prev, [name]: value }));
 	};
 
-	const handleImageUpload = (e) => {
+	// Check if the file is a valid image format
+	const isValidImageFile = (file) => {
+		// Accept common image MIME types
+		const validMimeTypes = [
+			'image/jpeg',
+			'image/jpg',
+			'image/png',
+			'image/gif',
+			'image/webp',
+			'image/bmp',
+			'image/svg+xml',
+			'image/heic',
+			'image/heif',
+			'image/heic-sequence',
+			'image/heif-sequence'
+		];
+
+		// Accept common image file extensions (especially for HEIC/HEIF which may not have correct MIME type)
+		const validExtensions = [
+			'.jpg', '.jpeg', '.png', '.gif', '.webp',
+			'.bmp', '.svg', '.heic', '.heif'
+		];
+
+		const fileName = file.name.toLowerCase();
+		const fileType = file.type.toLowerCase();
+
+		// Check MIME type
+		if (validMimeTypes.includes(fileType)) {
+			return true;
+		}
+
+		// Check file extension as fallback (important for HEIC files)
+		if (validExtensions.some(ext => fileName.endsWith(ext))) {
+			return true;
+		}
+
+		// Additional check: if MIME type starts with 'image/' (covers edge cases)
+		if (fileType.startsWith('image/')) {
+			return true;
+		}
+
+		return false;
+	};
+
+	const handleImageUpload = async (e) => {
 		const file = e.target.files[0];
-		if (file) {
-			// Validate file type
-			if (!file.type.startsWith('image/')) {
-				alert('Please select an image file');
-				return;
-			}
+		if (!file) return;
 
-			// Validate file size (max 5MB)
-			if (file.size > 5 * 1024 * 1024) {
-				alert('Image size must be less than 5MB');
-				return;
-			}
+		// Clear any previous errors
+		setUploadError(null);
 
-			const reader = new FileReader();
-			reader.onloadend = () => {
-				setFormData(prev => ({
-					...prev,
-					imagePreview: reader.result,
-					imageBase64: reader.result,
-					deleteImage: false
-				}));
-			};
-			reader.readAsDataURL(file);
+		// Validate file type
+		if (!isValidImageFile(file)) {
+			setUploadError('Please select a valid image file (JPG, PNG, GIF, WEBP, HEIC, etc.)');
+			return;
+		}
+
+		// Validate file size (max 10MB to accommodate HEIC files which can be larger)
+		if (file.size > 10 * 1024 * 1024) {
+			setUploadError('Image size must be less than 10MB');
+			return;
+		}
+
+		try {
+			// Create a preview URL for the image
+			const previewUrl = URL.createObjectURL(file);
+
+			setFormData(prev => ({
+				...prev,
+				imagePreview: previewUrl,
+				imageFile: file,
+				deleteImage: false
+			}));
+
+			setUploadError(null);
+		} catch (error) {
+			console.error('Image processing error:', error);
+			setUploadError('Failed to process image. Please try a different file.');
 		}
 	};
 
 	const handleRemoveImage = () => {
+		// Revoke the object URL to free up memory
+		if (formData.imagePreview && formData.imagePreview.startsWith('blob:')) {
+			URL.revokeObjectURL(formData.imagePreview);
+		}
+
 		setFormData(prev => ({
 			...prev,
 			imagePreview: null,
-			imageBase64: null,
+			imageFile: null,
 			deleteImage: true
 		}));
+		setUploadError(null);
 		if (fileInputRef.current) {
 			fileInputRef.current.value = '';
 		}
@@ -88,7 +157,7 @@ const PlayerForm = ({ initialData, onSubmit, onCancel, onDelete, isLoading = fal
 			firstName: formData.firstName.trim(),
 			lastName: formData.lastName.trim(),
 			team: formData.team,
-			imageBase64: formData.imageBase64,
+			imageFile: formData.imageFile,
 			deleteImage: formData.deleteImage
 		});
 	};
@@ -116,6 +185,13 @@ const PlayerForm = ({ initialData, onSubmit, onCancel, onDelete, isLoading = fal
 					)}
 				</div>
 
+				{/* Upload Error Message */}
+				{uploadError && (
+					<div className="w-full max-w-md p-3 bg-red-50 border border-red-300 rounded-md">
+						<p className="text-red-600 text-sm text-center">{uploadError}</p>
+					</div>
+				)}
+
 				{/* Image Upload Buttons */}
 				<div className="flex gap-2">
 					<button
@@ -142,10 +218,14 @@ const PlayerForm = ({ initialData, onSubmit, onCancel, onDelete, isLoading = fal
 				<input
 					ref={fileInputRef}
 					type="file"
-					accept="image/*"
+					accept="image/*,.heic,.heif"
 					onChange={handleImageUpload}
 					className="hidden"
 				/>
+
+				<p className="text-xs text-gray-500 text-center max-w-xs">
+					Supports JPG, PNG, GIF, WEBP, HEIC and other image formats (max 10MB)
+				</p>
 			</div>
 
 			{/* Player Name */}
@@ -191,11 +271,10 @@ const PlayerForm = ({ initialData, onSubmit, onCancel, onDelete, isLoading = fal
 							key={team.value}
 							type="button"
 							onClick={() => setFormData(prev => ({ ...prev, team: team.value }))}
-							className={`flex items-center justify-center gap-2 py-3 px-4 rounded-md border-2 transition-colors ${
-								formData.team === team.value
-									? 'border-orange-500 bg-orange-50'
-									: 'border-gray-300 hover:bg-gray-50'
-							}`}
+							className={`flex items-center justify-center gap-2 py-3 px-4 rounded-md border-2 transition-colors ${formData.team === team.value
+								? 'border-orange-500 bg-orange-50'
+								: 'border-gray-300 hover:bg-gray-50'
+								}`}
 						>
 							<IoShirt size={24} color={team.color} />
 						</button>
@@ -208,20 +287,20 @@ const PlayerForm = ({ initialData, onSubmit, onCancel, onDelete, isLoading = fal
 				<button
 					type="submit"
 					disabled={isLoading}
-					className="flex-1 flex items-center justify-center gap-2 bg-orange-600 text-white px-6 py-3 rounded-md hover:bg-orange-700 disabled:opacity-20 disabled:cursor-not-allowed"
+					className="flex-1 flex items-center justify-center gap-2 bg-orange-600 text-white px-6 py-3 rounded-md hover:bg-orange-700 disabled:opacity-20 disabled:cursor-not-allowed min-w-[120px]"
 				>
-					<FaSave className="h-4 w-4" />
-					<span>{isLoading ? 'Saving...' : 'Save'}</span>
+					<FaSave className="h-4 w-4 flex-shrink-0" />
+					<span className="inline-block w-16">{isLoading ? 'Saving...' : 'Save'}</span>
 				</button>
 
 				<button
 					type="button"
 					onClick={onCancel}
 					disabled={isLoading}
-					className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-6 py-3 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+					className="flex-1 flex items-center justify-center gap-2 border border-gray-300 px-6 py-3 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
 				>
-					<FaTimes className="h-4 w-4" />
-					<span>Cancel</span>
+					<FaTimes className="h-4 w-4 flex-shrink-0" />
+					<span className="inline-block w-16">Cancel</span>
 				</button>
 
 				{/* Delete Button (only for existing players) - Icon only */}
@@ -231,8 +310,8 @@ const PlayerForm = ({ initialData, onSubmit, onCancel, onDelete, isLoading = fal
 						onClick={handleDelete}
 						disabled={isLoading}
 						title="Delete player"
-						className="flex items-center justify-center bg-red-600 text-white px-4 py-3 rounded-md hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
-						>
+						className="flex items-center justify-center bg-red-600 text-white px-4 py-3 rounded-md hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed w-12"
+					>
 						<FaTrash className="h-4 w-4" />
 					</button>
 				)}

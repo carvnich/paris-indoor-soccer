@@ -90,12 +90,7 @@ export const EditMatch = () => {
 
 						{/* Match form or error state */}
 						{match ? (
-							<MatchForm
-								initialData={match}
-								onSubmit={handleSave}
-								onCancel={() => navigate('/matches')}
-								isLoading={saving}
-							/>
+							<MatchForm initialData={match} onSubmit={handleSave} onCancel={() => navigate('/matches')} isLoading={saving} />
 						) : (
 							<div className="text-center py-8 text-red-600">Match not found</div>
 						)}

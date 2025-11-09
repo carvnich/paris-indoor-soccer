@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { FaCaretLeft, FaEdit, FaPlus } from "react-icons/fa";
 import { IoShirt } from "react-icons/io5";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import RootLayout from "../components/layouts/RootLayout";
 import { useUser } from "../hooks/useUser";
 import { teamFilters } from "../utils/data";
@@ -11,7 +11,6 @@ import Spinner from "../components/Spinner";
 
 export const Rosters = () => {
 	const navigate = useNavigate();
-	const location = useLocation();
 	const { user } = useUser();
 	const isAdmin = user?.role === 'admin';
 
@@ -19,7 +18,6 @@ export const Rosters = () => {
 	const [players, setPlayers] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
-	const [successMessage, setSuccessMessage] = useState(null);
 
 	// Filter out "All" option for team tabs
 	const teams = teamFilters.filter(team => team.value !== "all");
@@ -42,16 +40,6 @@ export const Rosters = () => {
 		fetchPlayers();
 	}, []);
 
-	// Show success message from navigation state
-	useEffect(() => {
-		if (location.state?.message) {
-			setSuccessMessage(location.state.message);
-			// Clear the message after 3 seconds
-			setTimeout(() => setSuccessMessage(null), 3000);
-			// Clear navigation state
-			window.history.replaceState({}, document.title);
-		}
-	}, [location.state]);
 
 	// Filter players by selected team
 	const currentRoster = players.filter(player => player.team === selectedTeam);
@@ -99,13 +87,6 @@ export const Rosters = () => {
 								</button>
 							)}
 						</div>
-
-						{/* Success message */}
-						{successMessage && (
-							<div className="mb-4 p-4 border border-green-300 rounded-md bg-green-50">
-								<p className="text-green-600 text-sm">{successMessage}</p>
-							</div>
-						)}
 
 						{/* Error message */}
 						{error && (
