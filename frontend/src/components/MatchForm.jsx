@@ -56,8 +56,7 @@ const MatchForm = ({ initialData, onSubmit, onCancel, isLoading = false }) => {
 						const isoString = e.target.value ? new Date(e.target.value).toISOString() : '';
 						setFormData(prev => ({ ...prev, dateTime: isoString }));
 					}}
-					className="w-full max-w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700 cursor-pointer"
-					style={{ colorScheme: 'light' }}
+					className="w-full p-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700 cursor-pointer"
 				/>
 			</div>
 

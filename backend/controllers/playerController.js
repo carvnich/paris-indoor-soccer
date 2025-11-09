@@ -64,9 +64,13 @@ exports.createPlayer = async (req, res) => {
         // Upload image to ImageKit if provided
         if (imageBase64) {
             try {
+                // Extract file extension from base64 data URL
+                const match = imageBase64.match(/^data:image\/([a-zA-Z0-9+.-]+);base64,/);
+                const fileExtension = match ? match[1] : 'jpg';
+
                 const uploadResponse = await imagekit.upload({
                     file: imageBase64,
-                    fileName: `${team}_${firstName}_${lastName}_${Date.now()}.jpg`,
+                    fileName: `${team}_${firstName}_${lastName}_${Date.now()}.${fileExtension}`,
                     folder: "/paris-indoor-soccer/players",
                     tags: [team, "player"],
                 });
@@ -134,9 +138,13 @@ exports.updatePlayer = async (req, res) => {
 
             // Upload new image
             try {
+                // Extract file extension from base64 data URL
+                const match = imageBase64.match(/^data:image\/([a-zA-Z0-9+.-]+);base64,/);
+                const fileExtension = match ? match[1] : 'jpg';
+
                 const uploadResponse = await imagekit.upload({
                     file: imageBase64,
-                    fileName: `${team || player.team}_${firstName || player.firstName}_${lastName || player.lastName}_${Date.now()}.jpg`,
+                    fileName: `${team || player.team}_${firstName || player.firstName}_${lastName || player.lastName}_${Date.now()}.${fileExtension}`,
                     folder: "/paris-indoor-soccer/players",
                     tags: [team || player.team, "player"],
                 });
