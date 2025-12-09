@@ -9,7 +9,7 @@ export const teamColors = {
     Red: "#ff0000",
     Blue: "#0000ff",
     White: "#a5a5a5",
-    Grey: "#808080",
+    Grey: "#c4c4c4",
 };
 
 // Team color filter options for UI

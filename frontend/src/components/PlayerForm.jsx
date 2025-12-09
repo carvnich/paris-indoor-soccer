@@ -223,9 +223,6 @@ const PlayerForm = ({ initialData, onSubmit, onCancel, onDelete, isLoading = fal
 					className="hidden"
 				/>
 
-				<p className="text-xs text-gray-500 text-center max-w-xs">
-					Supports JPG, PNG, GIF, WEBP, HEIC and other image formats (max 10MB)
-				</p>
 			</div>
 
 			{/* Player Name */}
