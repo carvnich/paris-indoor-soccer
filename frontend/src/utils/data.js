@@ -70,101 +70,140 @@ export const fetchSeasonMatches = async (season) => {
     }
 };
 
+// Helper: resolve seeded placeholders and get team info
+const getTeamByPosition = (position, standings) => {
+    const index = { "1st": 0, "2nd": 1, "3rd": 2, "4th": 3, "5th": 4, "6th": 5 }[position];
+    return standings[index] || { team: "TBD" };
+};
+
+const SEED_POSITIONS = ["1st", "2nd", "3rd", "4th", "5th", "6th"];
+
+// Helper: extract winner from a match and resolve seeded placeholders
+const getWinner = (match, standings) => {
+    if (!match || match.homeScore === null || match.awayScore === null) return null;
+    const homeScore = Number(match.homeScore) || 0;
+    const awayScore = Number(match.awayScore) || 0;
+
+    let winnerTeam, winnerColor, winnerColorHex;
+    if (homeScore > awayScore) {
+        winnerTeam = match.homeTeam;
+        winnerColor = match.homeColor;
+        winnerColorHex = match.homeColorHex;
+    } else if (awayScore > homeScore) {
+        winnerTeam = match.awayTeam;
+        winnerColor = match.awayColor;
+        winnerColorHex = match.awayColorHex;
+    } else {
+        return null;
+    }
+
+    // Resolve seeded placeholders to actual team names
+    if (SEED_POSITIONS.includes(winnerTeam)) {
+        const team = getTeamByPosition(winnerTeam, standings);
+        return { team: team.team, color: team.color, colorHex: team.colorHex };
+    }
+
+    return { team: winnerTeam, color: winnerColor, colorHex: winnerColorHex };
+};
+
+// Helper: resolve seed placeholders in a single team field
+const resolveSeedPlaceholder = (teamValue, standings) => {
+    if (!SEED_POSITIONS.includes(teamValue)) return null;
+    return getTeamByPosition(teamValue, standings);
+};
+
 // Simple playoff team updates
 function updatePlayoffTeams(matches, standings) {
     if (!matches?.length || !standings?.length || standings.length < 6) return matches;
 
-    return matches.map((match) => {
+    // First pass: update seeded placeholders and winner-based matches
+    const firstPassMatches = matches.map((match) => {
         if (!match.isPlayoff) return match;
 
-        let updatedMatch = { ...match };
+        let updated = { ...match };
 
-        // Get team by position
-        const getTeamByPosition = (position) => {
-            const index = { "1st": 0, "2nd": 1, "3rd": 2, "4th": 3, "5th": 4, "6th": 5 }[position];
-            return standings[index] || { team: "TBD" };
-        };
-
-        // Get match winner
-        const getWinner = (matchToCheck) => {
-            if (!matchToCheck || matchToCheck.homeScore === null || matchToCheck.awayScore === null) return null;
-            const homeScore = Number(matchToCheck.homeScore) || 0;
-            const awayScore = Number(matchToCheck.awayScore) || 0;
-            if (homeScore > awayScore) return { team: matchToCheck.homeTeam, color: matchToCheck.homeColor, colorHex: matchToCheck.homeColorHex };
-            if (awayScore > homeScore) return { team: matchToCheck.awayTeam, color: matchToCheck.awayColor, colorHex: matchToCheck.awayColorHex };
-            return null;
-        };
-
-        // Update team placeholders with actual teams
-        if (["1st", "2nd", "3rd", "4th", "5th", "6th"].includes(match.homeTeam)) {
-            const team = getTeamByPosition(match.homeTeam);
-            updatedMatch.homeTeam = team.team;
-            updatedMatch.homeColor = team.color;
-            updatedMatch.homeColorHex = team.colorHex;
+        // Resolve seed placeholders in home/away teams
+        const homeTeamResolved = resolveSeedPlaceholder(updated.homeTeam, standings);
+        if (homeTeamResolved) {
+            updated.homeTeam = homeTeamResolved.team;
+            updated.homeColor = homeTeamResolved.color;
+            updated.homeColorHex = homeTeamResolved.colorHex;
         }
 
-        if (["1st", "2nd", "3rd", "4th", "5th", "6th"].includes(match.awayTeam)) {
-            const team = getTeamByPosition(match.awayTeam);
-            updatedMatch.awayTeam = team.team;
-            updatedMatch.awayColor = team.color;
-            updatedMatch.awayColorHex = team.colorHex;
+        const awayTeamResolved = resolveSeedPlaceholder(updated.awayTeam, standings);
+        if (awayTeamResolved) {
+            updated.awayTeam = awayTeamResolved.team;
+            updated.awayColor = awayTeamResolved.color;
+            updated.awayColorHex = awayTeamResolved.colorHex;
         }
 
-        // Handle "Lowest Seed" (winner of 3rd vs 6th)
-        if (match.awayTeam === "Lowest Seed") {
-            const quarterFinal = matches.find((m) => m.isPlayoff && new Date(m.dateTime) < new Date(match.dateTime) && m.homeTeam === standings[2]?.team && m.awayTeam === standings[5]?.team);
-            const winner = quarterFinal ? getWinner(quarterFinal) : null;
-            if (winner) {
-                updatedMatch.awayTeam = winner.team;
-                updatedMatch.awayColor = winner.color;
-                updatedMatch.awayColorHex = winner.colorHex;
-            } else {
-                updatedMatch.awayTeam = "TBD";
-            }
+        // Handle special placeholders
+        if (updated.awayTeam === "Lowest Seed") {
+            const qf = matches.find((m) => m.isPlayoff && new Date(m.dateTime) < new Date(updated.dateTime) && m.homeTeam === standings[2]?.team && m.awayTeam === standings[5]?.team);
+            const winner = getWinner(qf, standings);
+            updated.awayTeam = winner?.team ?? "TBD";
+            updated.awayColor = winner?.color;
+            updated.awayColorHex = winner?.colorHex;
         }
 
-        // Handle "Highest seed" (winner of 4th vs 5th)
-        if (match.awayTeam === "Highest seed") {
-            const quarterFinal = matches.find((m) => m.isPlayoff && new Date(m.dateTime) < new Date(match.dateTime) && m.homeTeam === standings[3]?.team && m.awayTeam === standings[4]?.team);
-            const winner = quarterFinal ? getWinner(quarterFinal) : null;
-            if (winner) {
-                updatedMatch.awayTeam = winner.team;
-                updatedMatch.awayColor = winner.color;
-                updatedMatch.awayColorHex = winner.colorHex;
-            } else {
-                updatedMatch.awayTeam = "TBD";
-            }
+        if (updated.awayTeam === "Highest seed") {
+            const qf = matches.find((m) => m.isPlayoff && new Date(m.dateTime) < new Date(updated.dateTime) && m.homeTeam === standings[3]?.team && m.awayTeam === standings[4]?.team);
+            const winner = getWinner(qf, standings);
+            updated.awayTeam = winner?.team ?? "TBD";
+            updated.awayColor = winner?.color;
+            updated.awayColorHex = winner?.colorHex;
         }
 
-        // Handle finals
-        if (match.homeTeam === "Finals" || match.awayTeam === "Finals") {
-            const semiFinal1 = matches.find((m) => m.isPlayoff && m.matchId !== match.matchId && new Date(m.dateTime) < new Date(match.dateTime) && m.homeTeam === standings[0]?.team);
-            const semiFinal2 = matches.find((m) => m.isPlayoff && m.matchId !== match.matchId && new Date(m.dateTime) < new Date(match.dateTime) && m.homeTeam === standings[1]?.team);
-
-            if (match.homeTeam === "Finals") {
-                const winner = semiFinal1 ? getWinner(semiFinal1) : null;
-                if (winner) {
-                    updatedMatch.homeTeam = winner.team;
-                    updatedMatch.homeColor = winner.color;
-                    updatedMatch.homeColorHex = winner.colorHex;
-                } else {
-                    updatedMatch.homeTeam = "TBD";
-                }
-            }
-
-            if (match.awayTeam === "Finals") {
-                const winner = semiFinal2 ? getWinner(semiFinal2) : null;
-                if (winner) {
-                    updatedMatch.awayTeam = winner.team;
-                    updatedMatch.awayColor = winner.color;
-                    updatedMatch.awayColorHex = winner.colorHex;
-                } else {
-                    updatedMatch.awayTeam = "TBD";
-                }
-            }
+        // Semi-final 1: 1st seed vs winner of 4th vs 5th
+        if (updated.homeTeam === standings[0]?.team && updated.awayTeam === "TBD") {
+            const qf = matches.find((m) => m.isPlayoff && new Date(m.dateTime) < new Date(updated.dateTime) &&
+                (m.homeTeam === standings[3]?.team || m.homeTeam === "4th") &&
+                (m.awayTeam === standings[4]?.team || m.awayTeam === "5th"));
+            const winner = getWinner(qf, standings);
+            updated.awayTeam = winner?.team ?? "TBD";
+            updated.awayColor = winner?.color;
+            updated.awayColorHex = winner?.colorHex;
         }
 
-        return updatedMatch;
+        // Semi-final 2: 2nd seed vs winner of 3rd vs 6th
+        if (updated.homeTeam === standings[1]?.team && updated.awayTeam === "TBD") {
+            const qf = matches.find((m) => m.isPlayoff && new Date(m.dateTime) < new Date(updated.dateTime) &&
+                (m.homeTeam === standings[2]?.team || m.homeTeam === "3rd") &&
+                (m.awayTeam === standings[5]?.team || m.awayTeam === "6th"));
+            const winner = getWinner(qf, standings);
+            updated.awayTeam = winner?.team ?? "TBD";
+            updated.awayColor = winner?.color;
+            updated.awayColorHex = winner?.colorHex;
+        }
+
+        return updated;
+    });
+
+    // Second pass: populate finals from semi-finals
+    return firstPassMatches.map((match) => {
+        if (!match.isPlayoff || (match.homeTeam !== "Finals" && match.awayTeam !== "Finals")) {
+            return match;
+        }
+
+        let updated = { ...match };
+
+        if (match.homeTeam === "Finals") {
+            const sf = firstPassMatches.find((m) => m.isPlayoff && m.matchId !== match.matchId && new Date(m.dateTime) < new Date(match.dateTime) && m.homeTeam === standings[0]?.team);
+            const winner = getWinner(sf, standings);
+            updated.homeTeam = winner?.team ?? "TBD";
+            updated.homeColor = winner?.color;
+            updated.homeColorHex = winner?.colorHex;
+        }
+
+        if (match.awayTeam === "Finals") {
+            const sf = firstPassMatches.find((m) => m.isPlayoff && m.matchId !== match.matchId && new Date(m.dateTime) < new Date(match.dateTime) && m.homeTeam === standings[1]?.team);
+            const winner = getWinner(sf, standings);
+            updated.awayTeam = winner?.team ?? "TBD";
+            updated.awayColor = winner?.color;
+            updated.awayColorHex = winner?.colorHex;
+        }
+
+        return updated;
     });
 }
 
